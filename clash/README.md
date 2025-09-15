@@ -11,11 +11,6 @@ Clash是一个基于规则的代理工具，支持订阅链接和可视化Web管
 
 如果您觉得我花费大量时间维护这个库对您有帮助，欢迎请我喝杯奶茶，您的支持将是我持续改进的动力！
 
-<div style="display: flex; justify-content: space-between;">
-  <img src="https://gitee.com/wuwzn/ha-addons/raw/master/0wwzn/Ali_Pay.jpg" height="350px" />
-  <img src="https://gitee.com/wuwzn/ha-addons/raw/master/0wwzn/WeChat_Pay.jpg" height="350px" />
-</div> 💖
-感谢您的支持与鼓励！
 ## 关于
 
 Clash是一个现代化的代理工具，支持多种协议（Shadowsocks、VMess、Trojan等），具有强大的规则分流功能和友好的Web界面。
