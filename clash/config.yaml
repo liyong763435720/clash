@@ -1,0 +1,51 @@
+name: Clash Meta
+version: 1.18.0
+slug: clash
+description: 带有用于管理代理订阅的Web仪表板的基于规则的隧道（Clash.Meta/Mihomo）
+url: https://github.com/MetaCubeX/mihomo
+arch:
+  - amd64
+  - aarch64
+  - armv7
+init: false
+startup: services
+stage: stable
+image: ghcr.io/liyong763435720/clash-{arch}
+ports:
+  "7890/tcp": 7890
+  "7891/tcp": 7891
+  "9090/tcp": 9090
+ports_description:
+  "7890/tcp": HTTP Proxy Port
+  "7891/tcp": SOCKS Proxy Port
+  "9090/tcp": Web Dashboard
+map:
+  - config:rw
+  - ssl:rw
+webui: http://[HOST]:[PORT:9090]/ui
+environment:
+  CLASH_CONFIG_PATH: /data/config/config.yaml
+options:
+  log_level: info
+  external_controller: 0.0.0.0:9090
+  secret: ""
+  subscription_url: ""
+  auto_update_subscription: true
+  update_interval: 86400
+  subscription_user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  custom_config: ""
+schema:
+  log_level: list(debug|info|warning|error|silent)
+  external_controller: str
+  secret: str?
+  subscription_url: str?
+  auto_update_subscription: bool
+  update_interval: int(3600,604800)
+  subscription_user_agent: str?
+  custom_config: str?
+auth_api: false
+ingress: false
+homeassistant_api: false
+host_network: false
+full_access: false
+apparmor: false
