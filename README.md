@@ -1,263 +1,232 @@
-# TradingAgents-CN Home Assistant 加载项使用说明
+# Clash Home Assistant Add-on
 
-！！！！注意：此加载项对HA硬件要求 内存4GB+ RAM (推荐 8GB+)
+![Supports aarch64 Architecture][aarch64-shield]
+![Supports amd64 Architecture][amd64-shield]
+![Supports armv7 Architecture][armv7-shield]
 
-## 🚀 快速开始
+Clash是一个基于规则的代理工具，支持订阅链接和可视化Web管理界面。
 
-### 1. 访问应用
+注意：本加载项仅可在官方HA固件使用。部分加速版的ha无法使用
 
-**方式一：直接访问**
-```
-http://您的Home Assistant IP地址:8501
-```
+## 关于
 
-**方式二：查看您的IP地址**
-- 在 Home Assistant 中，进入 `设置` → `系统` → `网络`
-- 查看您的IP地址，例如：`192.168.1.100`
-- 然后访问：`http://192.168.1.100:8501`
+Clash是一个现代化的代理工具，支持多种协议（Shadowsocks、VMess、Trojan等），具有强大的规则分流功能和友好的Web界面。
 
-**方式三：使用域名**
-```
-http://homeassistant.local:8501
-```
+## 功能特性
 
-### 2. 首次配置
+- 🌐 **支持多种协议**：Shadowsocks、VMess、Trojan、HTTP等
+- 📱 **Web可视化界面**：直观的节点管理和规则配置
+- 🔄 **订阅链接支持**：自动更新机场节点
+- 🎯 **智能分流**：基于规则的流量分流
+- 📊 **实时监控**：流量统计和连接管理
+- 🚀 **高性能**：原生Go语言编写，性能优异
 
-#### 步骤1：获取API密钥
+## 配置
 
-**阿里百炼API密钥 (推荐，国产大模型，中文优化)（必需）**
-1. 访问 [阿里云百炼平台](https://dashscope.aliyun.com/)
-2. 注册阿里云账号 -> 开通百炼服务 -> 获取API密钥
-3. 格式: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-4. 获取API Key
+### 基本选项
 
-**Tushare API Token (A股必需推荐，专业的中国金融数据源)**
-1. 获取地址: https://tushare.pro/register?reg=128886
-2. 注册Tushare账号 -> 邮箱验证
-3. 登录后进入个人中心 -> 获取Token
-4.复制Token（格式：xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx）
-# 注意：免费用户有调用频率限制，建议升级积分获得更高权限
+| 选项 | 描述 | 默认值 |
+|------|------|--------|
+| `log_level` | 日志级别 | `info` |
+| `external_controller` | 管理API地址 | `0.0.0.0:9090` |
+| `secret` | API访问密钥（可选） | `""` |
+| `subscription_url` | 机场订阅链接 | `""` |
+| `update_interval` | 订阅更新间隔（秒） | `86400` |
+| `auto_update` | 自动更新订阅 | `true` |
 
-**FinnHub API密钥（美股必需推荐 用于获取美股金融数据）**
-1. 访问 [FinnHub](https://finnhub.io/)
-2. 免费账户每分钟60次请求，足够日常使用
-3. 获取API Key 格式: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+### 端口配置
 
+- **7890**: HTTP代理端口
+- **7891**: SOCKS代理端口
+- **9090**: Web管理界面
 
+## 使用方法
 
-**其他API密钥（可选）**
-- Google AI API：用于Gemini模型
-- OpenAI API：用于GPT模型
-- Anthropic API：用于Claude模型
+### 1. 配置机场订阅
 
-#### 步骤2：配置Home Assistant加载项
-1. 在Home Assistant中，进入 `设置` → `加载项、备份与监控` → `加载项商店`
-2. 找到并点击 `TradingAgents-CN` 加载项
-3. 点击 `配置` 标签页
-4. 填入获取的API密钥：
-```yaml
-dashscope_api_key: "您的阿里百炼API密钥（必须）"
-tushare_token："您的Tushare API 密钥（必须 推荐用于A股）"
-finnhub_api_key: "您的FinnHub API密钥（必须 用于美股）"
-google_api_key: "您的Google AI API密钥（可选）"
-openai_api_key: "您的OpenAI API密钥（可选）"
-anthropic_api_key: "您的Anthropic API密钥（可选）"
-```
-5. 点击 `保存`
-6. 点击 `重新启动` 使配置生效
-
-## 📊 使用教程
-
-### 基础股票分析
-
-#### 1. 访问界面
-- 打开浏览器，访问 `http://您的IP:8501`
-- 等待界面加载完成
-
-#### 2. 输入股票代码
-**A股示例：**
-- `000001` - 平安银行
-- `000002` - 万科A
-- `600519` - 贵州茅台
-- `600036` - 招商银行
-- `300750` - 宁德时代
-
-**美股示例：**
-- `AAPL` - 苹果公司
-- `TSLA` - 特斯拉
-- `NVDA` - 英伟达
-- `GOOGL` - 谷歌
-- `MSFT` - 微软
-
-#### 3. 选择分析配置
-
-**研究深度级别：**
-- `1级` - 快速分析 (2-4分钟) - 日常监控
-- `2级` - 基础分析 (4-6分钟) - 常规投资
-- `3级` - 标准分析 (6-10分钟) - 重要决策 **[推荐]**
-- `4级` - 深度分析 (10-15分钟) - 重大投资
-- `5级` - 全面分析 (15-25分钟) - 最重要决策
-
-**智能体选择：**
-- ✅ **基本面分析师** - 分析财务数据、业绩指标
-- ✅ **技术分析师** - 分析价格走势、技术指标
-- ✅ **新闻分析师** - 分析相关新闻、市场情绪
-- ✅ **社交媒体分析师** - 分析社交媒体情绪
-
-#### 4. 启动分析
-1. 点击 `开始分析` 按钮
-2. 等待分析完成（可实时查看进度）
-3. 查看详细分析结果
-
-### 分析结果解读
-
-#### 投资建议
-- **买入 (BUY)** - 积极看好，建议购买
-- **持有 (HOLD)** - 保持现状，观望态度
-- **卖出 (SELL)** - 建议出售，规避风险
-
-#### 关键指标
-- **置信度** - AI分析的可信程度 (0-100%)
-- **风险评分** - 投资风险等级 (低/中/高)
-- **目标价位** - 预期股价目标
-- **时间框架** - 预期时间范围
-
-#### 详细报告
-- **执行摘要** - 核心投资建议
-- **分析师观点** - 各专业分析师的详细观点
-- **风险评估** - 潜在风险和机会
-- **推理过程** - AI的决策逻辑
-
-## ⚙️ 高级配置
-
-### 数据库优化（可选）
-
-如需提升性能，可以配置数据库支持：
+在加载项配置中填入你的机场订阅链接：
 
 ```yaml
-mongodb_enabled: true
-redis_enabled: true
-mongodb_host: "您的MongoDB主机"
-mongodb_port: 27017
-redis_host: "您的Redis主机"
-redis_port: 6379
+界面访问密码设置 secret：123456（可选）
+订阅连接配置 subscription_url: "https://your-airport.com/link/xxxxx"
+update_interval: 86400
+auto_update: true
 ```
 
-### 成本控制
+### 2. 访问Web界面
 
-**经济模式配置：**
-- 主要使用阿里百炼模型（成本较低）
-- 选择较低的研究深度
-- 减少并发分析师数量
+启动后浏览器访问：`http://homeassistant-ip:9090/ui` 如：http://192.168.2.33:9090/ui
+或在Home Assistant中点击"打开Web UI"
 
-**标准模式配置：**
-- 混合使用多种模型
-- 标准研究深度（3级）
-- 全部分析师参与
+API Base URL：homeassistant-ip:9090（ha地址+端口）
+Secret(optional)：123456（配置页中的密码）
+Add(添加)--并进入clash页面
 
-**高精度模式配置：**
-- 使用最先进的模型
-- 最高研究深度（4-5级）
-- 启用所有高级功能
+### 3. 选择代理节点
 
-## 🔧 故障排除
+在Web界面中：
+1. 选择"代理"标签页
+2. 在"🚀 手动切换"组中选择节点
+3. 查看连接状态和延迟测试
 
-### 常见问题
+### 4. 配置设备代理
 
-#### 1. 无法访问Web界面
-**解决方案：**
-- 确认加载项已启动（状态为"运行中"）
-- 检查IP地址是否正确
-- 尝试使用不同的浏览器
-- 清除浏览器缓存
+在设备上配置代理：
+- HTTP代理：`homeassistant-ip:7890`
+- SOCKS代理：`homeassistant-ip:7891`
 
-#### 2. API密钥错误
-**错误信息：** `API authentication failed`
-**解决方案：**
-- 检查API密钥是否正确复制
-- 确认API密钥未过期
-- 检查API配额是否用完
+## 高级配置
 
-#### 3. 股票代码无法识别
-**解决方案：**
-- A股使用6位数字代码
-- 美股使用字母代码
-- 确认股票代码拼写正确
+### 手动编辑配置文件
 
-#### 4. 分析速度慢
-**解决方案：**
-- 降低研究深度级别
-- 减少同时分析的智能体数量
-- 检查网络连接状况
+配置文件位置：`/config/clash/config.yaml`
 
-#### 5. 内存不足
-**解决方案：**
+可以通过File Editor加载项编辑，支持：
+- 自定义代理组
+- 规则分流设置  
+- DNS配置
+- 节点延迟测试
+
+### 订阅转换
+
+如果机场不支持Clash订阅，可以使用订阅转换服务：
+- `https://sub.xeton.dev`
+
+示例：
+```
+https://sub.xeton.dev?target=clash&url=你的原始订阅链接
+```
+
+## 代理规则
+
+默认规则集包括：
+- 🎯 **国内直连**：中国大陆网站和IP直连
+- 🚀 **海外代理**：被墙网站使用代理
+- 🛑 **广告拦截**：屏蔽广告和追踪域名
+- 📺 **流媒体**：Netflix、YouTube等分流
+
+## 故障排除
+
+### 1. 订阅更新失败
+- 检查订阅链接是否正确
+- 查看加载项日志获取错误信息
+- 尝试手动更新订阅
+
+### 2. 节点连接失败
+- 在Web界面测试节点延迟
+- 检查节点是否可用
+- 尝试切换其他节点
+
+### 3. Web界面无法访问
+- 确认端口9090未被占用
+- 检查防火墙设置
 - 重启加载项
-- 降低研究深度
-- 关闭其他占用内存的加载项
 
-### 查看日志
-1. 在Home Assistant中进入TradingAgents-CN加载项
-2. 点击 `日志` 标签页
-3. 查看详细错误信息
+### 4. 代理不生效
+- 确认设备代理配置正确
+- 检查代理端口7890/7891
+- 查看Clash日志确认连接状态
 
-## 📈 最佳实践
+## 配置示例
 
-### 投资分析建议
+### 基本配置
+```yaml
+log_level: info
+external_controller: "0.0.0.0:9090"
+secret: "your-secret-key"
+subscription_url: "https://your-airport.com/subscription"
+update_interval: 86400
+auto_update: true
+```
 
-#### 1. 分析策略
-- **日常监控**：使用1-2级快速分析
-- **投资决策**：使用3-4级标准/深度分析
-- **重大投资**：使用5级全面分析
+### 多订阅合并
+如果有多个机场订阅，可以使用订阅转换服务合并：
+```
+https://sub.xeton.dev?target=clash&url=订阅1|订阅2|订阅3
+```
 
-#### 2. 多维度验证
-- 同时分析相关股票
-- 对比不同时期的分析结果
-- 结合外部信息进行验证
+## Web界面功能
 
-#### 3. 风险管控
-- 关注风险评分和置信度
-- 不要完全依赖AI建议
-- 考虑个人风险承受能力
+### 概览页面
+- 实时速度监控
+- 活跃连接数
+- 上传下载统计
 
-### 系统优化建议
+### 代理页面
+- 节点延迟测试
+- 代理组切换
+- 节点连接状态
 
-#### 1. 定期维护
-- 每周重启一次加载项
-- 定期检查API密钥状态
-- 更新到最新版本
+### 规则页面
+- 规则匹配统计
+- 自定义规则添加
+- 规则优先级调整
 
-#### 2. 数据管理
-- 启用数据库缓存提升性能
-- 定期清理历史数据
-- 备份重要分析结果
+### 连接页面
+- 实时连接监控
+- 连接详细信息
+- 手动断开连接
 
-## 📞 支持与反馈
+### 日志页面
+- 实时日志查看
+- 日志级别筛选
+- 错误信息追踪
 
-### 获取帮助
-- **GitHub Issues**：[提交问题](https://github.com/liyong763435720/tradingagents-cn/issues)
-- **原项目文档**：[TradingAgents-CN](https://github.com/hsliuping/TradingAgents-CN)
+## 性能优化
 
-### 版本更新
-- 关注GitHub仓库获取最新版本
-- 查看CHANGELOG了解更新内容
-- 及时更新以获得最新功能和修复
+### DNS配置优化
+```yaml
+dns:
+  enable: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+```
 
-## ⚠️ 重要声明
+### 规则优化
+- 将常用网站规则放在前面
+- 使用域名规则而非正则表达式
+- 定期更新规则集
 
-**投资风险提示：**
-- 本工具仅用于研究和参考目的
-- 不构成具体投资建议
-- 投资有风险，决策需谨慎
-- 建议咨询专业财务顾问
+## 安全建议
 
-**技术限制：**
-- AI分析存在不确定性
-- 市场情况瞬息万变
-- 历史数据不代表未来表现
+1. **设置API密钥**：保护Web管理界面
+2. **限制访问IP**：仅允许内网访问
+3. **定期更新**：保持软件版本最新
+4. **监控日志**：关注异常连接
 
----
+## 更新日志
 
-🎉 **现在您可以开始使用TradingAgents-CN进行智能投资分析了！**
+### v1.18.0
+- 支持订阅链接自动更新
+- 集成Web管理界面
+- 优化规则分流逻辑
+- 添加延迟测试功能
 
-记住：理性投资，风险自控，AI辅助决策而非替代决策。
+## 支持
+
+如果遇到问题，请：
+
+1. 查看加载项日志获取错误信息
+2. 访问Clash官方文档了解配置语法
+3. 在GitHub仓库提交Issue
+
+GitHub仓库：https://github.com/liyong763435720/clash/issues
+
+## 许可证
+
+本项目基于GPL-3.0许可证开源。
+## ☕ 赞助支持
+
+如果您觉得我花费大量时间维护这个库对您有帮助，欢迎请我喝杯奶茶，您的支持将是我持续改进的动力！
+
+<div style="display: flex; justify-content: space-between;">
+  <img src="https://gitee.com/wuwzn/ha-addons/raw/master/0wwzn/Ali_Pay.jpg" height="350px" />
+  <img src="https://gitee.com/wuwzn/ha-addons/raw/master/0wwzn/WeChat_Pay.jpg" height="350px" />
+</div> 💖
+感谢您的支持与鼓励！
+[aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
+[amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
+[armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
